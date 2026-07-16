@@ -18,7 +18,11 @@ file(GLOB_RECURSE data engine/resources/*)
 
 # Library for engine code
 add_library(engine_lib STATIC ${engine_sources})
-target_include_directories(engine_lib PUBLIC engine/src engine/include)
+target_include_directories(engine_lib PUBLIC 
+    engine/src 
+    engine/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/engine
+)
 target_link_libraries(engine_lib PRIVATE Vulkan::Vulkan)
 target_compile_options(engine_lib PUBLIC -Wall -Wfloat-conversion)
 

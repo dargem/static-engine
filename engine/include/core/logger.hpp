@@ -6,15 +6,15 @@
 #include <iostream>
 #include <type_traits>
 
-namespace utils {
+namespace core {
 
 enum class LogLevel : uint8_t { TRACE = 0, DEBUG, INFO, WARN, ERROR, FATAL };
 
 // A file logger class, will log everything as or more critical than
 // keptLogLevel
-template <LogLevel kept_log_level> class Logger {
+template <LogLevel KEPT_LOG_LEVEL> class BackingLogger {
 public:
-  Logger(std::string_view filename) {
+  BackingLogger(std::string_view filename) {
     const std::filesystem::path path{filename};
 
     // Check if file exists
@@ -33,28 +33,27 @@ public:
     }
   }
 
-  Logger(const Logger&) = delete;
-  auto operator=(Logger&) -> Logger& = delete;
+  BackingLogger(const BackingLogger&) = delete;
+  auto operator=(BackingLogger&) -> BackingLogger& = delete;
 
   // Clean up holding the file
-  ~Logger() = default;
+  ~BackingLogger() = default;
 
-  // Log a message to the logger's file
-  // This call should be completely optimized away at compile time, if it
-  // doesn't log
-  template <LogLevel this_logs_level> void log(std::string_view message) {
+  // Log a message to the logger's file. This call should be completely
+  // optimized away at compile time, if it doesn't log.
+  template <LogLevel THIS_LOGS_LEVEL> void log(std::string_view message) {
     assert(log_file.is_open() && "File should always be open");
 
     using BackingType = std::underlying_type_t<LogLevel>;
-    if constexpr (static_cast<BackingType>(this_logs_level) >=
-                  static_cast<BackingType>(kept_log_level)) {
+    if constexpr (static_cast<BackingType>(THIS_LOGS_LEVEL) >=
+                  static_cast<BackingType>(KEPT_LOG_LEVEL)) {
       // for C++ 20 this works and onwards as a static assert is only evaluated
       // if the constexpr expression its in is true. Prior to C++ 20 this would
       // fail at compile time surprisingly
-      static_assert(level_to_string(this_logs_level) != "UNKNOWN",
-                    "Unknown is a default value for levelToString should never "
-                    "return this");
-      log_file << level_to_string(this_logs_level) << ": " << message << '\n';
+      static_assert(level_to_string(THIS_LOGS_LEVEL) != "UNKNOWN",
+                    "Unknown is a default value for level_to_string should "
+                    "never return this");
+      log_file << level_to_string(THIS_LOGS_LEVEL) << ": " << message << '\n';
       log_file.flush();
     }
   }
@@ -82,4 +81,4 @@ private:
   std::ofstream log_file;
 };
 
-} // namespace utils
+} // namespace core

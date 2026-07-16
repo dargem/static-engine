@@ -42,7 +42,16 @@ CheckOptions:
     value: lower_case
 
   - key: readability-identifier-naming.ValueTemplateParameterCase
-    value: lower_case
+    value: UPPER_CASE
 
   - key: readability-identifier-naming.TypeTemplateParameterCase
     value: CamelCase
+
+  - key: readability-identifier-naming.GlobalConstantCase
+    value: UPPER_CASE
+
+  - key: readability-identifier-naming.GlobalVariableCase
+    value: lower_case
+
+  - key: readability-identifier-naming.ConstexprVariableCase
+    value: UPPER_CASE

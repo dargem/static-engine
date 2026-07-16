@@ -1,0 +1,41 @@
+cmake_minimum_required(VERSION 3.5)
+
+project(static_engine)
+
+# Dependencies
+find_package(Vulkan REQUIRED)
+find_package(GTest REQUIRED)
+
+file(GLOB_RECURSE engine_sources engine/src/* engine/include/*)
+list(REMOVE_ITEM engine_sources "engine/src/main.cpp") # Remove main from the library
+
+file(GLOB_RECURSE sources_test engine/test/*)
+file(GLOB_RECURSE data engine/resources/*)
+
+# Library for engine code
+add_library(engine_lib STATIC ${engine_sources})
+target_include_directories(engine_lib PUBLIC engine/src engine/include)
+target_link_libraries(engine_lib PRIVATE Vulkan::Vulkan)
+
+# Main executable
+add_executable(static_eng engine/src/main.cpp)
+target_link_libraries(static_eng PRIVATE engine_lib)
+target_compile_options(static_eng PUBLIC -std=c++23 -Wall -Wfloat-conversion)
+file(COPY ${data} DESTINATION resources)
+
+# Test Executable
+add_executable(unit_tests ${sources_test})
+target_link_libraries(unit_tests PRIVATE 
+    GTest::gtest_main
+    engine_lib
+)
+
+install(TARGETS static_eng DESTINATION engine)
+install(DIRECTORY resources DESTINATION engine)
+
+set(CPACK_PACKAGE_NAME "MyExample")
+set(CPACK_PACKAGE_VERSION "1.0.0")
+
+set(CPACK_MONOLITHIC_INSTALL 1)
+
+include(CPack)

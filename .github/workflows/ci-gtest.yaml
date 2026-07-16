@@ -20,11 +20,6 @@ jobs:
       - name: Install Dependencies
         run: sudo apt-get update && sudo apt-get install -y libgtest-dev cmake build-essential libtbb-dev libxcb-xinput0 libxcb-xinerama0 libxcb-cursor-dev libvulkan-dev
 
-      # - name: Install Vulkan SDK
-      #   uses: humbletim/install-vulkan-sdk@v1.2
-      #   with:
-      #     cache: true   
-
       - name: Configure
         run: cd ${{ github.workspace }} && cmake -S . -B build
 

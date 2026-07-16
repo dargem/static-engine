@@ -1,0 +1,21 @@
+# --- Global settings for all files ---
+CompileFlags:
+  Add: [-std=c++23, -Wall, -Wextra]
+  Compiler: clang++
+
+Diagnostics:
+  ClangTidy:
+    Add: [bugprone-*, performance-*, modernity-*]
+    Remove: [modernize-use-trailing-return-type]
+
+Index:
+  Background: Build
+
+Hover:
+  ShowAKA: Yes
+
+InlayHints:
+  Designators: Yes
+  Enabled: Yes
+  ParameterNames: Yes
+  DeducedTypes: Yes

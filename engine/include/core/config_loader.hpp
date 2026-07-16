@@ -51,6 +51,25 @@ consteval auto split(std::string_view s, char delimiter)
   return separated;
 }
 
+/**
+ * @brief Sanitizes a inputted string_view by removing leading/trailing
+ * characters which are equal to discarded
+ *
+ * @param s The string_view to sanitize
+ * @param discarded
+ * @return std::string_view of sanitized string
+ */
+consteval auto sanitize(std::string_view s, char discarded = ' ')
+    -> std::string_view {
+  size_t start{};
+  size_t end{s.size()};
+
+  for (; start < end && s[start] == discarded; ++start);
+  for (; start < end && s[end - 1] == discarded; --end);
+  
+  return s.substr(start, end - start);
+}
+
 constexpr size_t NUM_CONFIGS = std::count(detail::VIEW_KV_CONFIGS.begin(),
                                           detail::VIEW_KV_CONFIGS.end(), '\n') +
                                1;
@@ -65,7 +84,8 @@ constexpr auto KV_STRING_PAIRS =
     if (pair.size() != 2) {
       throw "Invalid config pair";
     }
-    configs[index] = detail::KeyValueStringPair(pair[0], pair[1]);
+    configs[index] =
+        detail::KeyValueStringPair(sanitize(pair[0]), sanitize(pair[1]));
   }
 
   return configs;

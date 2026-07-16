@@ -10,13 +10,13 @@
 namespace core {
 
 namespace detail {
-// Load in raw character data, argument template type deduction has some issues
-constexpr std::array RAW_KV_CONFIG = std::to_array<char>({
+// Load in raw character data, using a raw C-style array to avoid compiler bugs with std::to_array and #embed
+constexpr char RAW_KV_CONFIG[] = {
 #embed CONFIGS_FILE_PATH
-    , '\0'});
+    , '\0'};
 
-constexpr std::string_view VIEW_KV_CONFIGS{RAW_KV_CONFIG.data(),
-                                           RAW_KV_CONFIG.size() - 1};
+constexpr std::string_view VIEW_KV_CONFIGS{RAW_KV_CONFIG,
+                                           sizeof(RAW_KV_CONFIG) - 1};
 
 struct KeyValueStringPair {
   std::string_view key;
@@ -66,7 +66,7 @@ consteval auto sanitize(std::string_view s, char discarded = ' ')
 
   for (; start < end && s[start] == discarded; ++start);
   for (; start < end && s[end - 1] == discarded; --end);
-  
+
   return s.substr(start, end - start);
 }
 

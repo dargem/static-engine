@@ -1,11 +1,10 @@
 #pragma once
 
-#pragma once
 #include <cassert>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
-#include <string>
+#include <type_traits>
 
 namespace utils {
 
@@ -13,19 +12,19 @@ enum class LogLevel : uint8_t { TRACE = 0, DEBUG, INFO, WARN, ERROR, FATAL };
 
 // A file logger class, will log everything as or more critical than
 // keptLogLevel
-template <LogLevel keptLogLevel> class Logger {
+template <LogLevel kept_log_level> class Logger {
 public:
   Logger(std::string_view filename) {
     const std::filesystem::path path{filename};
 
     // Check if file exists
-    bool fileExists = std::filesystem::exists(path);
-    std::ios_base::openmode mode = fileExists ? std::ios::app : std::ios::out;
+    bool file_exists = std::filesystem::exists(path);
+    std::ios_base::openmode mode = file_exists ? std::ios::app : std::ios::out;
 
-    logFile.open(path, mode);
+    log_file.open(path, mode);
 
-    if (!logFile.is_open()) {
-      if (fileExists) {
+    if (!log_file.is_open()) {
+      if (file_exists) {
         throw std::runtime_error(
             "File exists, but unable to open file for writing error logs");
       }
@@ -34,8 +33,8 @@ public:
     }
   }
 
-  Logger(const Logger &) = delete;
-  Logger &operator=(Logger &) = delete;
+  Logger(const Logger&) = delete;
+  auto operator=(Logger&) -> Logger& = delete;
 
   // Clean up holding the file
   ~Logger() = default;
@@ -43,24 +42,25 @@ public:
   // Log a message to the logger's file
   // This call should be completely optimized away at compile time, if it
   // doesn't log
-  template <LogLevel thisLogsLevel> void log(std::string_view message) {
-    assert(logFile.is_open() && "File should always be open");
+  template <LogLevel this_logs_level> void log(std::string_view message) {
+    assert(log_file.is_open() && "File should always be open");
 
-    if constexpr (static_cast<int>(thisLogsLevel) >=
-                  static_cast<int>(keptLogLevel)) {
+    using BackingType = std::underlying_type_t<LogLevel>;
+    if constexpr (static_cast<BackingType>(this_logs_level) >=
+                  static_cast<BackingType>(kept_log_level)) {
       // for C++ 20 this works and onwards as a static assert is only evaluated
       // if the constexpr expression its in is true. Prior to C++ 20 this would
       // fail at compile time surprisingly
-      static_assert(levelToString(thisLogsLevel) != "UNKNOWN",
+      static_assert(level_to_string(this_logs_level) != "UNKNOWN",
                     "Unknown is a default value for levelToString should never "
                     "return this");
-      logFile << levelToString(thisLogsLevel) << ": " << message << std::endl;
-      logFile.flush();
+      log_file << level_to_string(this_logs_level) << ": " << message << '\n';
+      log_file.flush();
     }
   }
 
 private:
-  static consteval auto levelToString(LogLevel level) -> std::string_view {
+  static consteval auto level_to_string(LogLevel level) -> std::string_view {
     switch (level) {
     case LogLevel::TRACE:
       return "TRACE";
@@ -79,7 +79,7 @@ private:
     // Fallback, if adding another log level make sure to map it
     return "UNKNOWN";
   }
-  std::ofstream logFile;
+  std::ofstream log_file;
 };
 
 } // namespace utils

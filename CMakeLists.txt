@@ -25,7 +25,7 @@ target_include_directories(engine_lib PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/engine
 )
 target_link_libraries(engine_lib PRIVATE Vulkan::Vulkan)
-target_compile_options(engine_lib PUBLIC -Wall -Wfloat-conversion)
+target_compile_options(engine_lib PUBLIC -Wall -Wfloat-conversion -Wc23-extensions)
 target_compile_definitions(engine_lib PUBLIC CONFIGS_FILE_PATH="${CMAKE_CURRENT_SOURCE_DIR}/engine/resources/configs.txt")
 
 # Main executable

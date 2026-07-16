@@ -2,6 +2,10 @@ cmake_minimum_required(VERSION 3.5)
 
 project(static_engine)
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 # Dependencies
 find_package(Vulkan REQUIRED)
 find_package(GTest REQUIRED)
@@ -16,11 +20,11 @@ file(GLOB_RECURSE data engine/resources/*)
 add_library(engine_lib STATIC ${engine_sources})
 target_include_directories(engine_lib PUBLIC engine/src engine/include)
 target_link_libraries(engine_lib PRIVATE Vulkan::Vulkan)
+target_compile_options(engine_lib PUBLIC -Wall -Wfloat-conversion)
 
 # Main executable
 add_executable(static_eng engine/src/main.cpp)
 target_link_libraries(static_eng PRIVATE engine_lib)
-target_compile_options(static_eng PUBLIC -std=c++23 -Wall -Wfloat-conversion)
 file(COPY ${data} DESTINATION resources)
 
 # Test Executable

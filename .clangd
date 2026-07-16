@@ -2,20 +2,24 @@
 CompileFlags:
   Add: [-std=c++23, -Wall, -Wextra]
   Compiler: clang++
+  CompilationDatabase: build
 
 Diagnostics:
   ClangTidy:
-    Add: [bugprone-*, performance-*, modernity-*]
-    Remove: [modernize-use-trailing-return-type]
+    Add:
+      - bugprone-*
+      - performance-*
+      - modernize-*
+      - readability-identifier-naming
 
 Index:
   Background: Build
 
 Hover:
-  ShowAKA: Yes
+  ShowAKA: true
 
 InlayHints:
-  Designators: Yes
-  Enabled: Yes
-  ParameterNames: Yes
-  DeducedTypes: Yes
+  Designators: true
+  Enabled: true
+  ParameterNames: true
+  DeducedTypes: true

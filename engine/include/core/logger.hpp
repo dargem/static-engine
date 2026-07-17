@@ -1,5 +1,6 @@
 #pragma once
 
+#include "core/config_loader.hpp"
 #include <cassert>
 #include <filesystem>
 #include <fstream>
@@ -12,9 +13,9 @@ enum class LogLevel : uint8_t { TRACE = 0, DEBUG, INFO, WARN, ERROR, FATAL };
 
 // A file logger class, will log everything as or more critical than
 // keptLogLevel
-template <LogLevel KEPT_LOG_LEVEL> class BackingLogger {
+class Logger {
 public:
-  BackingLogger(std::string_view filename) {
+  Logger(std::string_view filename) {
     const std::filesystem::path path{filename};
 
     // Check if file exists
@@ -33,11 +34,11 @@ public:
     }
   }
 
-  BackingLogger(const BackingLogger&) = delete;
-  auto operator=(BackingLogger&) -> BackingLogger& = delete;
+  Logger(const Logger&) = delete;
+  auto operator=(Logger&) -> Logger& = delete;
 
   // Clean up holding the file
-  ~BackingLogger() = default;
+  ~Logger() = default;
 
   // Log a message to the logger's file. This call should be completely
   // optimized away at compile time, if it doesn't log.
@@ -59,6 +60,23 @@ public:
   }
 
 private:
+  static constexpr LogLevel KEPT_LOG_LEVEL = [] -> LogLevel {
+    constexpr auto level = core::get_config<"log_level">();
+    if (level == "TRACE")
+      return LogLevel::TRACE;
+    if (level == "DEBUG")
+      return LogLevel::DEBUG;
+    if (level == "INFO")
+      return LogLevel::INFO;
+    if (level == "WARN")
+      return LogLevel::WARN;
+    if (level == "ERROR")
+      return LogLevel::ERROR;
+    if (level == "FATAL")
+      return LogLevel::FATAL;
+    throw "Unknown log level"
+  }();
+
   static consteval auto level_to_string(LogLevel level) -> std::string_view {
     switch (level) {
     case LogLevel::TRACE:

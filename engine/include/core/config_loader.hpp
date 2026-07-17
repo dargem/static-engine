@@ -1,5 +1,6 @@
 #pragma once
 
+#include "core/comp_string.hpp"
 #include <algorithm>
 #include <array>
 #include <ranges>
@@ -94,5 +95,19 @@ constexpr auto KV_STRING_PAIRS =
 
   return configs;
 }();
+
+/**
+ * @brief Get a view of the
+ *
+ * @tparam S
+ * @return std::string_view
+ */
+template <CompString S> constexpr auto get_config() -> std::string_view {
+  for (auto [key, value] : KV_STRING_PAIRS) {
+    if (key == S.view())
+      return sanitize(value);
+  }
+  throw "Key not found";
+}
 
 } // namespace core

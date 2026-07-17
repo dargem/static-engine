@@ -3,7 +3,7 @@
 #include "gtest/gtest.h"
 #include <string_view>
 
-TEST(CONFIG_LOADING, SanitizeString) {
+TEST(CONFIG_LOADER, SanitizeString) {
   // By default should drop leading / trailing spaces
   EXPECT_EQ(core::sanitize("no_filter_needed"), "no_filter_needed");
   EXPECT_EQ(core::sanitize("no filter needed"), "no filter needed");
@@ -14,7 +14,7 @@ TEST(CONFIG_LOADING, SanitizeString) {
   EXPECT_EQ(core::sanitize("@custom@char@@", '@'), "custom@char");
 }
 
-TEST(CONFIG_LOADING, StringSplit) {
+TEST(CONFIG_LOADER, StringSplit) {
 
   // Sanitize is consteval and returns a vector so we need to test this in a
   // constantly evaluated context.
@@ -54,3 +54,5 @@ TEST(CONFIG_LOADING, StringSplit) {
   EXPECT_TRUE(start_end_delimiters);
   EXPECT_TRUE(custom_delimiter);
 }
+
+TEST(CONFIG_LOADER, KV_STRING_PAIRS) { core::get_config<"log_level">(); }

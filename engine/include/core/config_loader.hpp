@@ -1,6 +1,5 @@
 #pragma once
 
-#include "core/comp_string.hpp"
 #include <algorithm>
 #include <array>
 #include <ranges>
@@ -10,7 +9,8 @@
 namespace core {
 
 namespace detail {
-// Load in raw character data, using a raw C-style array to avoid compiler bugs with std::to_array and #embed
+// Load in raw character data, using a raw C-style array to avoid compiler bugs
+// with std::to_array and #embed
 constexpr char RAW_KV_CONFIG[] = {
 #embed CONFIGS_FILE_PATH
     , '\0'};
@@ -26,9 +26,8 @@ struct KeyValueStringPair {
 } // namespace detail
 
 /**
- * @brief Split's a string into parts. Delimiter's at the start will result in a
- * split still with an empty string_view at the start. 2 consecutive delimiters
- * will result in a empty string view between them. The test has examples.
+ * @brief Split's a string into parts. A split which results in an empty
+ * string_view will skip adding that view.
  *
  * @tparam CS is the string literal to split
  * @tparam DELIMITER is the character it splits at
@@ -40,11 +39,16 @@ consteval auto split(std::string_view s, char delimiter)
   size_t last_split{};
   for (auto [index, letter] : std::views::enumerate(s)) {
     if (letter == delimiter) {
-      separated.push_back(s.substr(last_split, index - last_split));
+      if (index - last_split != 0) {
+        separated.push_back(s.substr(last_split, index - last_split));
+      }
       last_split = index + 1; // To skip this next time
-    } else if (index == s.size() - 1) {
+
+    } else if (index + 1 == s.size()) {
       // Need to have + 1 as we don't exclude current
-      separated.push_back(s.substr(last_split, index - last_split + 1));
+      if (index - last_split + 1 != 0) {
+        separated.push_back(s.substr(last_split, index - last_split + 1));
+      }
     }
   }
 

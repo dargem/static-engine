@@ -1,4 +1,4 @@
-#include "core/logger.hpp"
+#include "logger.hpp"
 
 #include <cstddef>
 #include <filesystem>
@@ -9,9 +9,9 @@
 
 #include "gtest/gtest.h"
 
-using core::Logger;
-using core::LogLevel;
-using core::detail::BackingLogger;
+using static_eng::Logger;
+using static_eng::LogLevel;
+using static_eng::detail::BackingLogger;
 
 namespace {
 // location of written out file

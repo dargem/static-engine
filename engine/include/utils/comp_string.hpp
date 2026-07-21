@@ -4,7 +4,7 @@
 #include <array>
 #include <string_view>
 
-namespace core {
+namespace static_eng::utils {
 
 template <size_t N> struct CompString {
   constexpr CompString(const char (&arr)[N]) {
@@ -19,4 +19,4 @@ template <size_t N> struct CompString {
   std::array<char, N> data;
 };
 
-} // namespace core
+} // namespace static_eng::utils

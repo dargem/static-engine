@@ -1,13 +1,13 @@
 #pragma once
 
-#include "core/config_loader.hpp"
+#include "utils/config_loader.hpp"
 #include <cassert>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
-#include <type_traits>
+#include <string_view>
 
-namespace core {
+namespace static_eng {
 
 enum class LogLevel : uint8_t { TRACE = 0, DEBUG, INFO, WARN, ERROR, FATAL };
 
@@ -84,7 +84,7 @@ private:
 } // namespace detail
 
 static constexpr LogLevel KEPT_LOG_LEVEL = [] -> LogLevel {
-  constexpr auto level = core::get_config<"log_level">();
+  constexpr auto level = utils::get_config<"log_level">();
   if (level == "TRACE")
     return LogLevel::TRACE;
   if (level == "DEBUG")
@@ -102,4 +102,4 @@ static constexpr LogLevel KEPT_LOG_LEVEL = [] -> LogLevel {
 
 using Logger = detail::BackingLogger<KEPT_LOG_LEVEL>;
 
-} // namespace core
+} // namespace static_eng

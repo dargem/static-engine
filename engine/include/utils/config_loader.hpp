@@ -1,20 +1,24 @@
 #pragma once
 
-#include "core/comp_string.hpp"
+#include "utils/comp_string.hpp"
 #include <algorithm>
 #include <array>
 #include <ranges>
 #include <string_view>
 #include <vector>
 
-namespace core {
+namespace static_eng::utils {
 
 namespace detail {
 // Load in raw character data, using a raw C-style array to avoid compiler bugs
 // with std::to_array and #embed
-constexpr char RAW_KV_CONFIG[] = {
-#embed CONFIGS_FILE_PATH
-    , '\0'};
+
+// constexpr char RAW_KV_CONFIG[] = {
+// #embed CONFIGS_FILE_PATH
+//     , '\0'};
+
+// For now we don't use EMBED due to a clangd bug
+constexpr char RAW_KV_CONFIG[] = {"log_level: INFO"};
 
 constexpr std::string_view VIEW_KV_CONFIGS{RAW_KV_CONFIG,
                                            sizeof(RAW_KV_CONFIG) - 1};
@@ -102,7 +106,7 @@ constexpr auto KV_STRING_PAIRS =
  * @tparam S
  * @return std::string_view
  */
-template <CompString S> constexpr auto get_config() -> std::string_view {
+template <CompString S> consteval auto get_config() -> std::string_view {
   for (auto [key, value] : KV_STRING_PAIRS) {
     if (key == S.view())
       return sanitize(value);
@@ -110,4 +114,4 @@ template <CompString S> constexpr auto get_config() -> std::string_view {
   throw "Key not found";
 }
 
-} // namespace core
+} // namespace static_eng::utils

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "defines.hpp"
-#include <logger.hpp>
+#include <core/logger.hpp>
 #include <string_view>
 
 namespace static_eng::platform {

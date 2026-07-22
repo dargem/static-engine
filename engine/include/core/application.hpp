@@ -1,21 +1,24 @@
 #pragma once
 
+#include "core/logger.hpp"
 #include "defines.hpp"
-#include "logger.hpp"
+#include "game_types.hpp"
 #include "platform/wayland.hpp"
+
 namespace static_eng {
 
 class Application {
 public:
-  Application(i16 width, i16 height, std::string_view log_file,
-              std::string_view app_name);
+  Application(Game&);
 
-  auto application_run() -> b8;
+  auto run() -> b8;
 
 private:
   Logger logger;
   platform::WaylandWindow platform;
+  Game& game_inst;
   b8 is_running;
+  b8 is_suspended;
 };
 
 } // namespace static_eng

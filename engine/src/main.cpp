@@ -1,20 +1,19 @@
+#include "application.hpp"
 #include "platform/wayland.hpp"
-#include <iostream>
+#include <defines.hpp>
 
 using static_eng::platform::PlatformError;
 using static_eng::platform::WaylandWindow;
 
 auto main() -> int {
-  try {
-    WaylandWindow window("My Engine", 1280, 720);
 
-    while (window.pump_messages()) {
-      // engine tick / render here
-    }
-  } catch (const PlatformError& e) {
-    std::cerr << "Wayland init failed: " << e.what() << '\n';
-    return 1;
-  }
+  static_eng::i16 width{1280};
+  static_eng::i16 height{960};
+  std::string_view log_file{"logs.txt"};
+  std::string_view app_name{"static_eng"};
+
+  static_eng::Application app(width, height, log_file, app_name);
+  app.application_run();
 
   return 0;
 }

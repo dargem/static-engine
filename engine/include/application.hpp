@@ -1,25 +1,16 @@
 #pragma once
 
 #include "defines.hpp"
-#include "platform/platform.hpp"
+#include "logger.hpp"
 #include "platform/wayland.hpp"
 namespace static_eng {
 
 class Application {
 public:
   Application(i16 width, i16 height, std::string_view log_file,
-              std::string_view app_name)
-      : logger(log_file), platform(app_name, width, height) {}
+              std::string_view app_name);
 
-  auto application_run() -> b8 {
-    while (is_running) {
-      if (!platform.pump_messages()) {
-        platform.set_running(false);
-      }
-    }
-
-    is_running = false;
-  }
+  auto application_run() -> b8;
 
 private:
   Logger logger;

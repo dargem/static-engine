@@ -84,22 +84,44 @@ private:
 } // namespace detail
 
 static constexpr LogLevel KEPT_LOG_LEVEL = [] -> LogLevel {
-  constexpr auto level = utils::get_config<"log_level">();
-  if (level == "TRACE")
+  constexpr auto LEVEL = utils::get_config<"log_level">();
+  if (LEVEL == "TRACE")
     return LogLevel::TRACE;
-  if (level == "DEBUG")
+  if (LEVEL == "DEBUG")
     return LogLevel::DEBUG;
-  if (level == "INFO")
+  if (LEVEL == "INFO")
     return LogLevel::INFO;
-  if (level == "WARN")
+  if (LEVEL == "WARN")
     return LogLevel::WARN;
-  if (level == "ERROR")
+  if (LEVEL == "ERROR")
     return LogLevel::ERROR;
-  if (level == "FATAL")
+  if (LEVEL == "FATAL")
     return LogLevel::FATAL;
   throw "Unknown log level";
 }();
 
-using Logger = detail::BackingLogger<KEPT_LOG_LEVEL>;
+class Logger {
+public:
+  Logger(const Logger&) = delete;
+  auto operator=(const Logger&) = delete;
+  Logger(Logger&&) = delete;
+  auto operator=(Logger&&) = delete;
+
+  /**
+   * @brief Get a logger instance
+   * This internally delegates to a backing logger which it returns
+   * @return detail::BackingLogger<KEPT_LOG_LEVEL>&
+   */
+  static auto get_instance() -> detail::BackingLogger<KEPT_LOG_LEVEL>& {
+    // Should update log path in the future
+    static detail::BackingLogger<KEPT_LOG_LEVEL> logger("logs.txt");
+    return logger;
+  }
+
+private:
+  Logger() = default;
+};
+
+// using Logger = detail::BackingLogger<KEPT_LOG_LEVEL>;
 
 } // namespace static_eng

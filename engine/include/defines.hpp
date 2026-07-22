@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstddef>
 #include <cstdint>
 
 namespace static_eng {
@@ -18,6 +19,7 @@ using f32 = float;
 using f64 = double;
 
 using b8 = bool;
+using byte = std::byte;
 
 // This will certainly catch plenty of bugs
 static_assert(sizeof(u8) == 1);

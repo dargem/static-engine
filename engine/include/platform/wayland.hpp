@@ -23,6 +23,7 @@ public:
 // the surface.
 class ShmBuffer {
 public:
+  // Can throw a WaylandError if fails to create
   ShmBuffer(wl_shm* shm, i32 width, i32 height, u32 argb_colour);
   ~ShmBuffer();
 
@@ -99,16 +100,16 @@ private:
 
   // Wayland object handles. Parents before children so that children get
   // destroyed before their parents.
-  wl_display* display = nullptr;
-  wl_registry* registry = nullptr;
-  wl_compositor* compositor = nullptr;
-  wl_shm* shm = nullptr;
-  wl_seat* seat = nullptr;
-  xdg_wm_base* wm_base = nullptr;
+  wl_display* display_ = nullptr;
+  wl_registry* registry_ = nullptr;
+  wl_compositor* compositor_ = nullptr;
+  wl_shm* shm_ = nullptr;
+  wl_seat* seat_ = nullptr;
+  xdg_wm_base* wm_base_ = nullptr;
 
-  wl_surface* surface = nullptr;
-  xdg_surface* xdg_surface = nullptr;
-  xdg_toplevel* xdg_toplevel = nullptr;
+  wl_surface* surface_ = nullptr;
+  xdg_surface* xdg_surface_ = nullptr;
+  xdg_toplevel* xdg_toplevel_ = nullptr;
 
   // Declared after so its destroyed first. ShmBuffer uses RAII.
   std::optional<ShmBuffer> buffer;

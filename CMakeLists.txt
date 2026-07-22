@@ -32,11 +32,11 @@ target_compile_definitions(engine_lib PUBLIC CONFIGS_FILE_PATH="${CMAKE_CURRENT_
 pkg_check_modules(WAYLAND wayland-client)
 
 if (WAYLAND_FOUND)
-    target_compile_definitions(engine_lib PRIVATE HAVE_WAYLAND=1)
+    target_compile_definitions(engine_lib PUBLIC HAVE_WAYLAND=1)
     target_link_libraries(engine_lib PRIVATE ${WAYLAND_LIBRARIES})
     target_include_directories(engine_lib PRIVATE ${WAYLAND_INCLUDE_DIRS})
 else()
-    target_compile_definitions(engine_lib PRIVATE HAVE_WAYLAND=0)
+    target_compile_definitions(engine_lib PUBLIC HAVE_WAYLAND=0)
 endif()
 
 # Main executable

@@ -3,7 +3,7 @@
 
 #pragma once
 
-// #ifdef HAVE_WAYLAND
+#ifdef HAVE_WAYLAND
 
 #include "defines.hpp"
 #include "platform/xdg-shell-client-protocol.h"
@@ -14,16 +14,18 @@
 #include <string>
 
 namespace static_eng::platform {
-class WaylandError : public std::runtime_error {
+
+class PlatformError : public std::runtime_error {
 public:
-  explicit WaylandError(const std::string& what) : std::runtime_error(what) {}
+  explicit PlatformError(std::string_view what)
+      : std::runtime_error(std::string(what)) {}
 };
 
 // Small RAII wrapper around the shm-backed pixel buffer used to back
 // the surface.
 class ShmBuffer {
 public:
-  // Can throw a WaylandError if fails to create
+  // Can throw a PlatformError if fails to create
   ShmBuffer(wl_shm* shm, i32 width, i32 height, u32 argb_colour);
   ~ShmBuffer();
 
@@ -46,8 +48,8 @@ private:
 
 class WaylandWindow {
 public:
-  // Throws WaylandError on failure
-  WaylandWindow(const std::string& application_name, i32 width, i32 height);
+  // Throws PlatformError on failure
+  WaylandWindow(std::string_view application_name, i32 width, i32 height);
   ~WaylandWindow();
 
   WaylandWindow(const WaylandWindow&) = delete;
@@ -64,6 +66,8 @@ public:
   auto is_running() const -> b8 {
     return running;
   }
+
+  void set_running(b8 setting) { running = setting; }
 
   [[nodiscard]]
   auto get_width() const -> i32 {
@@ -95,7 +99,7 @@ private:
   // setup helpers, called from the constructor
   void connect_display();
   void bind_globals();
-  void create_window(const std::string& application_name);
+  void create_window(std::string_view application_name);
   void initial_commit();
 
   // Wayland object handles. Parents before children so that children get
@@ -127,4 +131,4 @@ private:
 
 } // namespace static_eng::platform
 
-// #endif
+#endif

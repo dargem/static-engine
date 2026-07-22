@@ -1,4 +1,4 @@
-// #ifdef HAVE_WAYLAND
+#ifdef HAVE_WAYLAND
 
 #include "platform/wayland.hpp"
 
@@ -16,19 +16,19 @@ ShmBuffer::ShmBuffer(wl_shm* shm, i32 width, i32 height, u32 argb_colour) {
   char name[] = "wl_shm_cpp";
   int fd = memfd_create(name, MFD_CLOEXEC);
   if (fd < 0) {
-    throw WaylandError("Failed to create shm-backed temp file for buffer.");
+    throw PlatformError("Failed to create shm-backed temp file for buffer.");
   }
   shm_unlink(name);
 
   if (ftruncate(fd, size) < 0) {
     close(fd);
-    throw WaylandError("ftruncate failed while sizing shm buffer.");
+    throw PlatformError("ftruncate failed while sizing shm buffer.");
   }
 
   void* data = mmap(nullptr, size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
   if (data == MAP_FAILED) {
     close(fd);
-    throw WaylandError("mmap failed while creating shm buffer.");
+    throw PlatformError("mmap failed while creating shm buffer.");
   }
 
   u32* pixels = static_cast<u32*>(data);
@@ -47,7 +47,7 @@ ShmBuffer::ShmBuffer(wl_shm* shm, i32 width, i32 height, u32 argb_colour) {
   wl_shm_pool_destroy(pool);
 
   if (!buffer) {
-    throw WaylandError("Failed to create wl_buffer from shm pool.");
+    throw PlatformError("Failed to create wl_buffer from shm pool.");
   }
 }
 
@@ -151,7 +151,7 @@ void WaylandWindow::on_xdg_toplevel_close(void* data, struct xdg_toplevel*) {
 }
 
 // Construction + Teardown
-WaylandWindow::WaylandWindow(const std::string& application_name, i32 width,
+WaylandWindow::WaylandWindow(std::string_view application_name, i32 width,
                              i32 height)
     : width(width), height(height) {
   connect_display();
@@ -163,14 +163,14 @@ WaylandWindow::WaylandWindow(const std::string& application_name, i32 width,
 void WaylandWindow::connect_display() {
   display_ = wl_display_connect(nullptr);
   if (!display_) {
-    throw WaylandError("Failed to connect to Wayland display.");
+    throw PlatformError("Failed to connect to Wayland display.");
   }
 }
 
 void WaylandWindow::bind_globals() {
   registry_ = wl_display_get_registry(display_);
   if (!registry_) {
-    throw WaylandError("Failed to get Wayland registry.");
+    throw PlatformError("Failed to get Wayland registry.");
   }
   wl_registry_add_listener(registry_, &REGISTRY_LISTENER, this);
 
@@ -179,7 +179,7 @@ void WaylandWindow::bind_globals() {
   wl_display_roundtrip(display_);
 
   if (!compositor_ || !shm_ || !wm_base_) {
-    throw WaylandError(
+    throw PlatformError(
         "Missing required Wayland globals (compositor / shm / xdg_wm_base). "
         "Is this actually running under a Wayland compositor?");
   }
@@ -187,26 +187,26 @@ void WaylandWindow::bind_globals() {
   xdg_wm_base_add_listener(wm_base_, &WM_BASE_LISTENER, this);
 }
 
-void WaylandWindow::create_window(const std::string& application_name) {
+void WaylandWindow::create_window(std::string_view application_name) {
   surface_ = wl_compositor_create_surface(compositor_);
   if (!surface_) {
-    throw WaylandError("Failed to create wl_surface.");
+    throw PlatformError("Failed to create wl_surface.");
   }
 
   xdg_surface_ = xdg_wm_base_get_xdg_surface(wm_base_, surface_);
   if (!xdg_surface_) {
-    throw WaylandError("Failed to create xdg_surface.");
+    throw PlatformError("Failed to create xdg_surface.");
   }
   xdg_surface_add_listener(xdg_surface_, &XDG_SURFACE_LISTENER, this);
 
   xdg_toplevel_ = xdg_surface_get_toplevel(xdg_surface_);
   if (!xdg_toplevel_) {
-    throw WaylandError("Failed to create xdg_toplevel.");
+    throw PlatformError("Failed to create xdg_toplevel.");
   }
   xdg_toplevel_add_listener(xdg_toplevel_, &XDG_TOPLEVEL_LISTENER, this);
 
-  xdg_toplevel_set_title(xdg_toplevel_, application_name.c_str());
-  xdg_toplevel_set_app_id(xdg_toplevel_, application_name.c_str());
+  xdg_toplevel_set_title(xdg_toplevel_, std::string(application_name).c_str());
+  xdg_toplevel_set_app_id(xdg_toplevel_, std::string(application_name).c_str());
 }
 
 void WaylandWindow::initial_commit() {
@@ -217,7 +217,7 @@ void WaylandWindow::initial_commit() {
   wl_display_roundtrip(display_);
 
   if (!surface_configured) {
-    throw WaylandError("Compositor never sent initial xdg_surface configure.");
+    throw PlatformError("Compositor never sent initial xdg_surface configure.");
   }
 
   buffer.emplace(shm_, width, height, 0xFF000000u /* opaque black */);
@@ -227,7 +227,7 @@ void WaylandWindow::initial_commit() {
   wl_surface_commit(surface_);
 
   if (wl_display_flush(display_) < 0) {
-    throw WaylandError("wl_display_flush failed after initial commit.");
+    throw PlatformError("wl_display_flush failed after initial commit.");
   }
 }
 
@@ -303,4 +303,4 @@ auto WaylandWindow::pump_messages() -> b8 {
 }
 
 } // namespace static_eng::platform
-// #endif
+#endif

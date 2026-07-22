@@ -100,28 +100,6 @@ static constexpr LogLevel KEPT_LOG_LEVEL = [] -> LogLevel {
   throw "Unknown log level";
 }();
 
-class Logger {
-public:
-  Logger(const Logger&) = delete;
-  auto operator=(const Logger&) = delete;
-  Logger(Logger&&) = delete;
-  auto operator=(Logger&&) = delete;
-
-  /**
-   * @brief Get a logger instance
-   * This internally delegates to a backing logger which it returns
-   * @return detail::BackingLogger<KEPT_LOG_LEVEL>&
-   */
-  static auto get_instance() -> detail::BackingLogger<KEPT_LOG_LEVEL>& {
-    // Should update log path in the future
-    static detail::BackingLogger<KEPT_LOG_LEVEL> logger("logs.txt");
-    return logger;
-  }
-
-private:
-  Logger() = default;
-};
-
-// using Logger = detail::BackingLogger<KEPT_LOG_LEVEL>;
+using Logger = detail::BackingLogger<KEPT_LOG_LEVEL>;
 
 } // namespace static_eng

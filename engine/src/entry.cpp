@@ -1,4 +1,5 @@
 #include "entry.hpp"
+#include "logger.hpp"
 
 auto main() -> int {
   // Specific file for logging info on engine initialization
@@ -16,17 +17,18 @@ auto main() -> int {
 
   if (!create_game(game_inst)) {
     startup_logger.log<static_eng::LogLevel::FATAL>("Game failed to create");
-    return -1;
+    return 1;
   }
 
-  if (!game_inst.initializer || !game_inst.update || !game_inst.render ||
+  if (!game_inst.initialize || !game_inst.update || !game_inst.render ||
       !game_inst.on_resize) {
     startup_logger.log<static_eng::LogLevel::FATAL>(
         "Game does not have all its functions assigned");
-    return -1;
+    return 1;
   }
 
-  static_eng::Application app(game_inst);
+  static_eng::Application app(game_inst, startup_logger);
+
   app.run();
   return 0;
 }

@@ -9,9 +9,11 @@ namespace static_eng {
 
 class Application {
 public:
-  Application(Game&);
+  Application(Game&, Logger&);
 
   auto run() -> b8;
+
+  auto get_game_inst() -> Game&;
 
 private:
   Logger logger;

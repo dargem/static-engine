@@ -1,5 +1,5 @@
 #include "entry.hpp"
-#include "logger.hpp"
+#include "core/logger.hpp"
 
 auto main() -> int {
   // Specific file for logging info on engine initialization
@@ -27,8 +27,19 @@ auto main() -> int {
     return 1;
   }
 
-  static_eng::Application app(game_inst, startup_logger);
+  auto app =
+      static_eng::Application::make_application(game_inst, startup_logger);
 
-  app.run();
+  if (!app) {
+    startup_logger.log<static_eng::LogLevel::FATAL>(
+        "Application did not properly create");
+    return 1;
+  }
+
+  if (!app->run()) {
+    startup_logger.log<static_eng::LogLevel::FATAL>(
+        "Application did not shut down gracefully");
+  }
+
   return 0;
 }

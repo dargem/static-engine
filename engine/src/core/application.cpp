@@ -23,14 +23,35 @@ Application::Application(Game& game, Logger& startup_logger)
   game_inst.on_resize(&game_inst, platform.get_width(), platform.get_height());
 }
 
+auto Application::make_application(Game& game, Logger& startup_logger)
+    -> std::expected<Application, std::string> {
+  try {
+    return std::expected<Application, std::string>{std::in_place, game,
+                                                   startup_logger};
+  } catch (const std::exception& e) {
+    return std::unexpected(e.what());
+  }
+}
+
 auto Application::run() -> b8 {
   while (is_running) {
     if (!platform.pump_messages()) {
       platform.set_running(false);
     }
-  }
 
-  if (!is_suspended) {
+    if (!is_suspended) {
+      if (!game_inst.update(&game_inst, 0.0f)) {
+        logger.log<LogLevel::FATAL>("Game updated failed, shutting down");
+        is_running = false;
+        break;
+      }
+
+      if (!game_inst.render(&game_inst, 0.0f)) {
+        logger.log<LogLevel::FATAL>("Game render failed, shutting down");
+        is_running = false;
+        break;
+      }
+    }
   }
 
   return true; // We have ran the app
